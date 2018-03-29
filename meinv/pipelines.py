@@ -7,7 +7,7 @@
 
 import pymongo
 from scrapy.conf import settings
-import os
+from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
 
 class MeinvPipeline(object):
@@ -39,6 +39,7 @@ class MongodbPipeline(object):
         client = pymongo.MongoClient(host=host,port=port)
         db = client[db_name]
         self.post = db[collection_name]
+        self.save_sueceed = set()
 
 
     def process_item(self,item,spider):
@@ -51,7 +52,13 @@ class MongodbPipeline(object):
             'imaget_url': item['image_url'],
             'tag': item['tag']
         }
-        self.post.insert_one(data)
-        print('%s  写入mongodb成功' % item['image_title'])
-        return item
+        # 去重 并 插入数据到mongodb
+        if item['image_url'] not in self.save_sueceed:
+            self.save_sueceed.add(item['image_url'])
+            self.post.insert_one(data)
+            print('%s  写入mongodb成功' % item['image_title'])
+            return item
+        else:
+            raise DropItem(" %s  -->>>>> this picture exists"  % item)
+
 

@@ -90,11 +90,18 @@ class GirlsSpider(scrapy.Spider):
                 print('******* 找不到下一页  %s图集只有一张图片*********' %response.meta['album_url'])
 
     def SaveImage(self,response):
+        """
+        保存图片到本地
+        :param response:
+        :return:
+        """
         album_title = response.meta['album_title']
         img_title = response.meta['img_title']
+        # 拼接保存图片的路径
         path = os.path.abspath('.') + '\\xiaojiejie\\' + album_title +'\\'
         if not os.path.exists(path):
             os.makedirs(path)
+
         file = path + img_title + '.jpg'
         with open(file,'wb') as f:
             f.write(response.body)
