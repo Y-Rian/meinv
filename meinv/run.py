@@ -1,2 +1,2 @@
 from scrapy.cmdline import execute
-execute("scrapy crawl girls  ".split())
+execute("scrapy crawl girls  --nolog".split())

@@ -2,15 +2,18 @@
 import scrapy
 from meinv.items import MeinvItem
 import time
+import os
 from scrapy import Request
+
+
 class GirlsSpider(scrapy.Spider):
     name = 'girls'
     allowed_domains = ['55156.com']
     start_urls = [
-        'http://www.55156.com/meinvtupian/',
+        # 'http://www.55156.com/meinvtupian/',
         # 'http://www.55156.com/gaoqingtaotu/',
         # 'http://www.55156.com/weimeiyijing/',
-        # 'http://www.55156.com/katongdongman/',
+        'http://www.55156.com/katongdongman/',
     ]
 
     # 图集数量
@@ -59,12 +62,16 @@ class GirlsSpider(scrapy.Spider):
         item = MeinvItem()
         img_url = response.xpath('//div[@class="articleBody"]/p/a/img/@src')[0].extract()
         img_title = response.xpath('//div[@class="articleBody"]/p/a/img/@alt')[0].extract()
-        item['image_title'] = img_url
-        item['image_url'] = img_title
+        item['image_title'] = img_title
+        item['image_url'] = img_url
         item['album_title'] = response.meta['album_title']
         item['album_url'] = response.meta['album_url']
         item['tag'] = response.meta['tag']
         yield item
+        yield Request(img_url, callback=self.SaveImage, meta={
+            'album_title': item['album_title'],
+            'img_title': item['album_title'],
+        })
 
         status = response.xpath('//div[@class="pages"]/ul').extract()
         next_page = response.xpath('//div[@class="pages"]/ul/li[last()]/a/@href').extract()
@@ -82,6 +89,15 @@ class GirlsSpider(scrapy.Spider):
             else:
                 print('******* 找不到下一页  %s图集只有一张图片*********' %response.meta['album_url'])
 
-
+    def SaveImage(self,response):
+        album_title = response.meta['album_title']
+        img_title = response.meta['img_title']
+        path = os.path.abspath('.') + '\\xiaojiejie\\' + album_title +'\\'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        file = path + img_title + '.jpg'
+        with open(file,'wb') as f:
+            f.write(response.body)
+            print('%s **** 图片写入成功' % img_title)
 
 

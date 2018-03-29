@@ -99,9 +99,15 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'meinv.pipelines.MeinvPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'meinv.pipelines.MeinvPipeline': 300,
+   'meinv.pipelines.MongodbPipeline': 500,
+}
+IMAGES_STORE = ''
+MONGO_HOST = 'localhost'
+MONGO_PORT = 27017
+MONGO_DB = 'xiaojiejie'
+MONGO_COLLECTION = '55156.COM'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
